@@ -1,0 +1,55 @@
+class Solution {
+public:
+    long long minimumCost(string source, string target, vector<char>& original, vector<char>& changed, vector<int>& cost) {
+        long long ans = 0;
+        vector<vector<pair<int,int>>> adj(26);
+        for(int i = 0; i<original.size(); i++)
+        {
+            int from = original[i]-'a';
+            int to = changed[i]-'a';
+            adj[from].push_back({to, cost[i]});
+        }
+        vector<vector<long long>> dist(26, vector<long long>(26,1e18));
+        for(int i =0; i<26; i++)
+        {
+            int src = i;
+            vector<long long>vis(26,0);
+            priority_queue<pair<long long ,long long>, vector<pair<long long ,long long>>, greater<pair<long long ,int>>>pq;
+            dist[src][src]= 0;
+            pq.push({0, src});
+            while(!pq.empty())
+            {
+                auto ele = pq.top();
+                pq.pop();
+                long long dis = ele.first;
+                int node = ele.second;
+                vis[node]=1;
+                // if(dist[node]<= dis) continue;
+                
+                for(auto child : adj[node])
+                {
+                    if(!vis[child.first])
+                    {
+                        long long distc = child.second;
+                        int nnode = child.first;
+                        
+                        if(dis + distc < dist[src][nnode])
+                        {
+                            dist[src][nnode] = dis + distc;
+                            pq.push({dist[src][nnode], nnode});
+                        }
+                    }
+                }
+            } 
+        }
+        for(int i = 0; i<source.size(); i++)
+        {
+            if(source[i]==target[i]) continue;
+            if(dist[source[i]-'a'][target[i]-'a']==1e18) return -1;
+            ans += dist[source[i]-'a'][target[i]-'a'];
+        }
+        return ans;
+        
+    }
+
+};
